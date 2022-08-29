@@ -11,7 +11,7 @@ from math import exp
 #from numba import jit
 # Lunghezza rettangolo e numero di iterazioni
 L = 50
-max_iter_time = 15000# delta_t * max_iter_time = T
+max_iter_time = 14000# delta_t * max_iter_time = T
 
 v = 1 # velocità propagazione
 
@@ -79,13 +79,16 @@ def is_intern(k, i, j):
 
     return True
 
-# Restituisce un vicino ammissibile dove non vi è una cellula tumorale
-def choose_border_migration_cells(k, i, j):
+# mode = 0: Restituisce un vicino ammissibile dove non vi è una cellula tumorale 
+# mode = 1: Restituisce un vicino ammisibile qualunque
+def choose_border_migration_cells(k, i, j, mode):
     possible_position = []
     for c in range(i - 1, i + 2):
         for l in range(j - 1, j + 2):
-            if cancer_cells[k, c, l] == 0: # devo aggiungere il caso in cui la cellula è al bordo del dominio e devo escludere alcune celle perchè non definite
+            if mode == 0 and cancer_cells[k, c, l] == 0: # devo aggiungere il caso in cui la cellula è al bordo del dominio e devo escludere alcune celle perchè non definite
                                            # potrebbe dare errore index out of range
+                possible_position.append((c, l))
+            elif mode == 1:
                 possible_position.append((c, l))
     lun = len(possible_position)
     if lun  > 1:
@@ -99,7 +102,7 @@ def cellular_division(k, i, j, cancer_cells, normal_cells, necrotic_cells):
     if is_intern(k, i, j): # la cellula si trova all'interno del tumore
         cancer_cells[k:, i, j] = cancer_cells[k - 1, i, j] + 1
     else: # la cellula si trova al bordo del tumore
-        new_i, new_j = choose_border_migration_cells(k, i, j) # ritorna una lista di due elementi
+        new_i, new_j = choose_border_migration_cells(k, i, j, 0) # ritorna una lista di due elementi
         print("sito scelto per la divisione cellulare scelto (%d, %d) per la cellula tumorale alla pos (%d, %d)" %(new_i, new_j, i, j))
         cancer_cells[k:, new_i, new_j] = 1 #poichè in tale posizione prima non c'era nessuna cellula tumorale
         if normal_cells[k, new_i, new_j] == 1:
@@ -112,6 +115,30 @@ def cellular_mytosis(k, i, j, cancer_cells, necrotic_cells):
     cancer_cells[k:, i, j] = cancer_cells[k - 1, i, j] - 1
     if cancer_cells[k, i, j] == 0:
         necrotic_cells[k:, i, j] = 1
+
+# Effettua movimento cellulare
+def cellular_movement(k, i, j, cancer_cells, normal_cells, necrotic_cells):
+    if is_intern(k, i, j):
+        new_i, new_j = choose_border_migration_cells(k, i, j, 1)
+        cancer_cells[k:, i, j] = cancer_cells[k, i, j] - 1
+        cancer_cells[k: new_i, new_j] = cancer_cells[k, new_i, new_j] + 1
+    else:# è sul bordo
+        new_i, new_j = choose_border_migration_cells(k, i, j, 0)
+        if cancer_cells[k, i, j] > 1:
+            if normal_cells[k, new_i, new_j] > 0:
+                normal_cells[k:, new_i, new_j] = 0
+            else:
+                necrotic_cells[k:, new_i, new_j] = 0
+            cancer_cells[k:, new_i, new_j] = 1
+        else:
+            cancer_cells[k:, new_i, new_j] = 1
+            if normal_cells[k, new_i, new_j] > 0:
+                normal_cells[k:, new_i, new_j] = 0
+                normal_cells[k:, i, j] = 1
+            else:
+                necrotic_cells[k:, new_i, new_j] = 0
+                necrotic_cells[k: i, j] = 1
+    
 
 # conta tutte le cellule tumorali presenti
 def count_cancer_cells(k, cancer_cells):
@@ -130,7 +157,7 @@ def evolution(N, M, cancer_cells, necrotic_cells):
     p_div = 0
     p_del = 0
     p_mov = 0
-
+    nmov = 0
     for k in range(0, max_iter_time-1, 1): # EVOLUZIONE TEMPORALE, ogni iterazione passa un tempo delta_t
         for i in range(1, L - 1, delta_x):
             for j in range(1, L - 1, delta_x):
@@ -156,7 +183,7 @@ def evolution(N, M, cancer_cells, necrotic_cells):
                 for j in range(1, L - 1, delta_x):
                     if np.random.binomial(1, p, 1) == 1 and cancer_cells[k, i, j] >= 1: # setaccio tutte le cellule tumorali e se ve ne sono in un sito allora provo ad effettuare un evoluzione
                         # la cellula tumorale è stata selezionata per evolvere
-                        c = np.random.binomial(1, p, 1)[0] # con probabilità 1/2 scelgo un'azione o l'altra
+                        c = np.random.randint(0, 3) 
                         if c == 1: #l'azione selezionata è la divisione cellulare
                             p_div = 1 - exp(-1 * ((N[k, i, j] / (cancer_cells[k, i, j] * theta_div))**2))
                             print("p_div at time %d is %.3f nutriment at (%d, %d) = %.3f" % (k, p_div, i, j, N[k, i, j]))
@@ -174,14 +201,19 @@ def evolution(N, M, cancer_cells, necrotic_cells):
                                                                                           # con la morte dell'unica cellula tumorale
                                 print("muore una cellula tumorale") 
                                 cellular_mytosis(k, i, j, cancer_cells, necrotic_cells)
-                        ## DA IMPLEMENTARE ULTERIORE AZIONE
-                        #else: # c == 2 e quindi compio una migrazione cellulare
-                        #    p_mov = 1 -  exp(-1 * ((M[k, i, j] / (cancer_cells[k, i, j] * theta_mov)) ** 2))
-                        #    is_mov = np.random.binomial(1, p_del, 1)[0]
-
+                   
+                        elif c == 2:# mossa cellulare
+                            p_mov = 1 - exp(-1*cancer_cells[k, i, j]*(M[k, i, j] / theta_mov))
+                            print("p_mov at time %d is %.3f nutriment at (%d, %d) = %.3f and in this site cancer cells are %d" % (k, p_mov, i, j, M[k, i, j], cancer_cells[k, i, j]))
+                            is_move = np.random.binomial(1, p_mov, 1)[0]
+                            if is_move == 1:
+                                print("Spostamento cellulare")
+                                cellular_movement(k, i, j, cancer_cells, normal_cells, necrotic_cells)
+                                nmov += 1
             # Tengo conto del numero ci cellule tumorali che crescono per vedere se verifica la legge di gompertz
             num_cancer_cells[0, int(k/s) - 1] = count_cancer_cells(k, cancer_cells)
 
+    print("numero totale di movimenti %d\n" %(nmov))
 ## 
 # Routine per il plot della heatmap ad ogni iterazione k
 def plotheatmap(u_k, k, m):
@@ -234,10 +266,10 @@ def animate_cancer(k):
 #anim = animation.FuncAnimation(plt.figure(), animate_nutr, interval=20, frames=max_iter_time, repeat=False)
 #anim.save("nutr.gif")
 
-anim = animation.FuncAnimation(plt.figure(), animate_nutr, interval=20, frames=max_iter_time, repeat=False)
-anim.save("reactdiffTest9.gif")
-#anim = animation.FuncAnimation(plt.figure(), animate_cancer, interval=20, frames=max_iter_time, repeat=False)
-#anim.save("cancerTest8.gif")
+#anim = animation.FuncAnimation(plt.figure(), animate_nutr, interval=20, frames=max_iter_time, repeat=False)
+#anim.save("reactdiffTest9.gif")
+anim = animation.FuncAnimation(plt.figure(), animate_cancer, interval=20, frames=max_iter_time, repeat=False)
+anim.save("cancerTest.gif")
 #fig, axes = plt.subplots(ncols=2)
 #ax1, ax2 = axes
 
