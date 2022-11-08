@@ -4,19 +4,34 @@
 using namespace std;
 
 // FUNCTIONS CLASSES IMPLEMENTATION
-template<typename T>
-int CellularAutomata<T>::print_state(){
-	for(int i = 0; i < L_grid; i++){
-		for(int j = 0; j < L_grid; j++){
-			cout << cells_state[i][j] << " ";
+// case with no input, initialize with null arrays
+CellularAutomata::CellularAutomata(){
+	for(int i = 0; i < L_grid, i++){
+		vector<int> temp;
+		for(int j = 0, j < L_grid; j++){
+			temp.push_back(0);
 		}
-		cout << endl;
+		cells_state.push_back(temp);
 	}
-
-	return 0;
 }
 
-template<typename T>
-void TumorAutomata<T>::start_evolution(int i, int j){
-	cells_state[i][j] = 1;
+// IMPLEMENT AUTOMATIC SEED INITIALIZATION THROUGH RECTANGLE
+// case with initial seed:
+// (i, j) central position
+// (2*seed_height + 1, 2*seed_len + 1) size of tumor rectangle
+
+CellularAutomata:CellularAutomata(int i, int j, int seed_height, int seed_len){
+	for(int k = 0; k < L_grid, k++){
+		vector<int> temp;
+		for(int l = 0, k < L_grid; k++){
+			if(k == i && l == j){
+				temp.push_back(1);
+			}
+		}
+	}
+}
+
+// Change value of a cell
+void CellularAutomata::change_value(int i, int j, int k){
+	cells_state[i][j] = 1; 
 }
