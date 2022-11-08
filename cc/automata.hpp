@@ -13,44 +13,57 @@
 
 // CLASSES DEFINITION
 
+/*
+* porting di cs2.py in C++ per migliorarne 
+* le prestazioni di calcolo
+* dopo la risoluzione numerica del modello i dati verranno comunque
+* passati ad un file python per il post-processing dei dati in una gif
+* author: Morph1c
+* date: 04/09/2022
+*/
+
+#include <iostream>
+#include <math.h>
+#include <fstream>
+//#include "automata.cpp"
+
+using namespace std;
+
+
+// CLASSES DEFINITION
+
 // Class prototype for normal/death cellular automata
-template<typename T>
 class CellularAutomata{
 	private:
-		T cells_state[L_grid][L_grid];
+		int L_grid
+		vector<vector<int>> cells_state;	
 	public:
-		CellularAutomata(T states[L_grid][L_grid]){
-			for(int i = 0; i < L_grid; i++){
-				for(int j = 0; j < L_grid; j++){
-					cells_state[i][j] = states[i][j];
-				}
-			}
-		}
+		CellularAutomata();
+		CellularAutomata(int i, int j, int seed_height, int seed_len);
 		int print_state();
+		void change_value(int i, int j);
 
 };
 
 // Class prototype for tumor cellular automata that is derived
 // from the master class CellularAutomata
 
-template<typename T>
-class TumorAutomata: public CellularAutomata<T>{
+class TumorAutomata{
 	private:
-		T cells_state[L_grid][L_grid];
+		int L_grid;
+		vector<vector<int>> tumor_state		
 	public:
-		TumorAutomata(T states[L_grid][L_grid]): CellularAutomata<T>(states){
-			for(int i = 0; i < L_grid; i++){
-				for(int j = 0; j < L_grid; j++){
-					cells_state[i][j] = states[i][j];
-				}
-			}
-		}
-		void start_evolution(int i, int j);
-		bool is_intern(int k, int i, int j);
-		int choose_border_migration_cells(int k, int i, int j);
-		void cellular_division(int k, int i, int j, int cancer_cells[L_grid][L_grid],  int normal_cells[L_grid], int death_cells[L_grid][L_grid]);
-		void cellular_mytosis(int k, int i, int j, int cancer_cells[L_grid][L_grid], int necrotic_cells[L_grid][L_grid]);
+	   TumorAutomata();
+	   TumorAutomata(int i, int j, int seed_height, int seed_len);
+	   void start_evolution(int i, int j);
+	   bool is_intern(int k, int i, int j);
+	   int choose_border_migration_cells(int k, int i, int j);
+	   void cellular_division(int k, int i, int j, int cancer_cells[L_grid][L_grid],  int normal_cells[L_grid], int death_cells[L_grid][L_grid]);
+	   void cellular_mytosis(int k, int i, int j, int cancer_cells[L_grid][L_grid], int necrotic_cells[L_grid][L_grid]);
 
 };
+
+
+
 
 
