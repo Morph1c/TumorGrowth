@@ -4,11 +4,13 @@
 using namespace std;
 
 // FUNCTIONS CLASSES IMPLEMENTATION
+
+
 // case with no input, initialize with null arrays
 CellularAutomata::CellularAutomata(){
-	for(int i = 0; i < L_grid, i++){
+	for(int i = 0; i < L_grid; i++){
 		vector<int> temp;
-		for(int j = 0, j < L_grid; j++){
+		for(int j = 0; j < L_grid; j++){
 			temp.push_back(0);
 		}
 		cells_state.push_back(temp);
@@ -20,18 +22,32 @@ CellularAutomata::CellularAutomata(){
 // (i, j) central position
 // (2*seed_height + 1, 2*seed_len + 1) size of tumor rectangle
 
-CellularAutomata:CellularAutomata(int i, int j, int seed_height, int seed_len){
-	for(int k = 0; k < L_grid, k++){
+CellularAutomata::CellularAutomata(int i, int j){
+	for(int k = 0; k < L_grid; k++){
 		vector<int> temp;
-		for(int l = 0, k < L_grid; k++){
+		for(int l = 0; l < L_grid; l++){
 			if(k == i && l == j){
 				temp.push_back(1);
 			}
+			else{
+				temp.push_back(0);
+			}
 		}
+		cells_state.push_back(temp);
 	}
 }
 
 // Change value of a cell
 void CellularAutomata::change_value(int i, int j, int k){
-	cells_state[i][j] = 1; 
+	cells_state[i][j] = k; 
+}
+
+// print actual state of the automata
+void CellularAutomata::print_state(){
+	for(int i = 0; i < L_grid; i++){
+		for(int j = 0; j < L_grid; j++){
+			cout << cells_state[i][j] << " ";
+		}
+		cout << endl;
+	}
 }
