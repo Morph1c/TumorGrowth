@@ -7,6 +7,12 @@
 * date: 04/09/2022
 */
 
+/* AGGIORNAMENTO 23/11/2022
+* Per ora implementata solo classe CA in maniera banale 
+* ma funzionante, ora bisogna riprodurre il codice della simulazione
+* il problema gif resta secondario
+*/
+
 #include <iostream>
 #include <math.h>
 #include <fstream>
@@ -15,6 +21,7 @@
 using namespace std;
 
 // FUNCTION DEFINITON
+
 double k_N(int i, int j, int cancer_cells[L_grid][L_grid], int normal_cells[L_grid][L_grid]){
 
 	return (alpha * alpha) * normal_cells[i][j] + lambda_N * (alpha * alpha) * cancer_cells[i][j];
@@ -49,11 +56,12 @@ void fill_number(int array[L_grid][L_grid], int value){
 int main(void){
 
 	// variabili per la simulazione
-	int cells_number = (int) (L_grid / delta_x);
-	cout << "len grid: " << cells_number << endl;
-	double gamma = (V * delta_t) / (delta_x * delta_x);
+	//int cells_number = (int) (L_grid / delta_x);
+	//cout << "len grid: " << cells_number << endl;
+	//double gamma = (V * delta_t) / (delta_x * delta_x);
 
 	// definisco tensori utili per la simulazione
+	/*
 	int cancer_cells[L_grid][L_grid];
 	int normal_cells[L_grid][L_grid];
 	int death_cells[L_grid][L_grid];
@@ -63,12 +71,15 @@ int main(void){
 
 	double N[L_grid][L_grid];
 	double M[L_grid][L_grid];
+	*/
 
-	TumorAutomata<int> A(cancer_cells);
+	CellularAutomata A(3, 3);
 	A.print_state();
-	cout << "after" << endl;
-	A.start_evolution(5, 5);
+	A.change_value(1, 1, 10);
+	cout << endl;
 	A.print_state();
+
+	/*
 
 	// condizioni iniziali nutrimento
 	for(int i = 0; i < L_grid; i++){
@@ -98,6 +109,7 @@ int main(void){
 		}
 		write_array(N);
 	}
+	*/
 	
 	return 0;
 }
