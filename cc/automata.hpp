@@ -1,7 +1,7 @@
 // constant definition
 #define L_grid 10
 #define alpha 3/L_grid
-#define MAX_ITER_TIME 10
+#define MAX_ITER_TIME 1000
 #define V 1
 #define delta_x 1
 #define delta_t 0.02
@@ -10,8 +10,6 @@
 #define lambda_M 10
 #define theta_div 0.3
 #define theta_del 0.01
-
-// CLASSES DEFINITION
 
 /*
 * porting di cs2.py in C++ per migliorarne 
@@ -25,6 +23,7 @@
 #include <iostream>
 #include <math.h>
 #include <fstream>
+#include <vector>
 //#include "automata.cpp"
 
 using namespace std;
@@ -35,25 +34,25 @@ using namespace std;
 // Class prototype for normal/death cellular automata
 class CellularAutomata{
 	private:
-		int L_grid
+		//int L_grid;
 		vector<vector<int>> cells_state;	
 	public:
-		CellularAutomata();
-		CellularAutomata(int i, int j, int seed_height, int seed_len);
-		int print_state();
-		void change_value(int i, int j);
+		CellularAutomata(); // constructor for no input
+		CellularAutomata(int i, int j);
+		void print_state();
+		void change_value(int i, int j, int k);
 
 };
 
 // Class prototype for tumor cellular automata that is derived
 // from the master class CellularAutomata
-
+/*
 class TumorAutomata{
 	private:
 		int L_grid;
 		vector<vector<int>> tumor_state		
 	public:
-	   TumorAutomata();
+	   TumorAutomata(); // same null constructor
 	   TumorAutomata(int i, int j, int seed_height, int seed_len);
 	   void start_evolution(int i, int j);
 	   bool is_intern(int k, int i, int j);
@@ -62,6 +61,7 @@ class TumorAutomata{
 	   void cellular_mytosis(int k, int i, int j, int cancer_cells[L_grid][L_grid], int necrotic_cells[L_grid][L_grid]);
 
 };
+*/
 
 
 
