@@ -11,10 +11,12 @@
 #include <math.h>
 #include <fstream>
 #include "automata.cpp"
+#include "solver.cpp"
 
 using namespace std;
 
 // FUNCTION DEFINITON
+/*
 double k_N(int i, int j, int cancer_cells[L_grid][L_grid], int normal_cells[L_grid][L_grid]){
 
 	return (alpha * alpha) * normal_cells[i][j] + lambda_N * (alpha * alpha) * cancer_cells[i][j];
@@ -45,31 +47,24 @@ void fill_number(int array[L_grid][L_grid], int value){
 		}
 	}
 }
-
+*/
 int main(void){
-
+	double delta = 1;
 	// variabili per la simulazione
-	int cells_number = (int) (L_grid / delta_x);
-	cout << "len grid: " << cells_number << endl;
-	double gamma = (V * delta_t) / (delta_x * delta_x);
+	//int cells_number = (int) (L_grid / delta_x);
+	//cout << "len grid: " << cells_number << endl;
+	//double gamma = (V * delta_t) / (delta_x * delta_x);
 
-	// definisco tensori utili per la simulazione
-	int cancer_cells[L_grid][L_grid];
-	int normal_cells[L_grid][L_grid];
-	int death_cells[L_grid][L_grid];
-	fill_number(cancer_cells, 0);
-	fill_number(normal_cells, 0);
-	fill_number(death_cells, 0);
+	TumorAutomata cancer;
+	CellularAutomata normal:
+	CellularAutomata death;
 
-	double N[L_grid][L_grid];
-	double M[L_grid][L_grid];
+	GridSolver M(delta, L_grid);
+	GridSolver N(delta, L_grid);
 
-	TumorAutomata<int> A(cancer_cells);
-	A.print_state();
-	cout << "after" << endl;
-	A.start_evolution(5, 5);
-	A.print_state();
-
+	N.set_initial_condition();
+	M.set_initial_condition();
+	/*
 	// condizioni iniziali nutrimento
 	for(int i = 0; i < L_grid; i++){
 		for(int j = 0; j < L_grid; j++){
@@ -98,6 +93,6 @@ int main(void){
 		}
 		write_array(N);
 	}
-	
+	*/
 	return 0;
 }
