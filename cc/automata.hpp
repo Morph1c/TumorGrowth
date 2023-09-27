@@ -28,7 +28,7 @@
 #include <vector>
 //#include "automata.cpp"
 
-using namespace std;
+using namespace std; // BAD PRACTICE
 
 
 // CLASSES DEFINITION
